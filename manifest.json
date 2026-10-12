@@ -1,0 +1,17 @@
+{
+  "name": "Foxed Pages",
+  "short_name": "Foxed Pages",
+  "description": "A private life journal on aged yellow paper.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "en",
+  "background_color": "#d8c07f",
+  "theme_color": "#d8c07f",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

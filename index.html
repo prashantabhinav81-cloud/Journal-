@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#d8c07f">
+<meta name="description" content="A private life journal on aged yellow paper.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Foxed Pages">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Foxed Pages</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=IM+Fell+English:ital@0;1&family=Literata:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* Layout concept: one aged sheet per screen. Today is a ruled page you write on, Chrono is the table of contents, Random is a deck of pages that snap into view one at a time. The paper tint follows the day's big moment. This is a deliberate single look: paper stays paper in any theme. */
+:root{
+  --paper:#ead9a4; --paper-hi:#f4e8bf; --paper-lo:#d8c07f; --edge:#b48a45;
+  --ink:#2a1f14; --ink-soft:#5e4a33; --rule:rgba(110,76,34,.30); --margin:#a8392b; --stamp:#8c2f23;
+  --f-display:'IM Fell English',Georgia,'Times New Roman',serif;
+  --f-body:'Literata',Georgia,'Times New Roman',serif;
+  --f-label:'Courier Prime','Courier New',monospace;
+  --lh:32px;
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .22 0 0 0 0 .08 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  --mottle:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='520' height='520'%3E%3Cfilter id='m' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.011' numOctaves='3' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .52 0 0 0 0 .33 0 0 0 0 .1 0 0 0 1.1 -.4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+}
+[data-tone="plain"]{--paper:#ead9a4;--paper-hi:#f4e8bf;--paper-lo:#d8c07f;--edge:#b48a45;--stamp:#8c2f23}
+[data-tone="gold"]{--paper:#f0cd63;--paper-hi:#f8dd85;--paper-lo:#dfb23e;--edge:#b9871f;--stamp:#6f4300}
+[data-tone="red"]{--paper:#e2ae98;--paper-hi:#eec3af;--paper-lo:#cf917b;--edge:#a35a45;--stamp:#7a1f1a}
+[data-tone="blue"]{--paper:#bcc9c4;--paper-hi:#cfdad5;--paper-lo:#a5b5b0;--edge:#6f8480;--stamp:#244a55}
+[data-tone="green"]{--paper:#cdd09b;--paper-hi:#dde0b0;--paper-lo:#b8bd82;--edge:#8a8f4f;--stamp:#3b4814}
+[data-tone="plum"]{--paper:#cdb4bf;--paper-hi:#dcc6d0;--paper-lo:#b998a7;--edge:#8a6376;--stamp:#54304a}
+
+*{box-sizing:border-box}
+:root{color-scheme:light}
+[hidden]{display:none!important}
+img{max-width:100%}
+html{background:var(--paper-lo)}
+html,body{height:100%}
+body{margin:0;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);background:var(--paper-lo);color:var(--ink);font:17px/1.65 var(--f-body);-webkit-text-size-adjust:100%}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--margin);outline-offset:2px}
+
+#app{height:100%;display:flex;flex-direction:column;max-width:600px;margin:0 auto;position:relative;background:var(--paper);box-shadow:0 0 50px rgba(70,40,10,.35)}
+.sheet{position:relative;background:linear-gradient(90deg,transparent 30px,rgba(168,57,43,.5) 30px,rgba(168,57,43,.5) 31px,transparent 31px),var(--grain),var(--mottle),radial-gradient(circle at 16% 9%,rgba(150,95,30,.18) 0 5%,transparent 6%),radial-gradient(circle at 82% 71%,rgba(150,95,30,.14) 0 7%,transparent 8%),radial-gradient(circle at 40% 94%,rgba(150,95,30,.12) 0 4%,transparent 5%),radial-gradient(ellipse at 50% 40%,var(--paper-hi) 0,var(--paper) 62%,var(--paper-lo) 100%);box-shadow:inset 0 0 80px var(--edge),inset 0 0 6px rgba(70,40,10,.4);transition:background-color .4s}
+.bar::before{content:"";position:absolute;left:30px;top:0;bottom:0;width:1px;background:var(--margin);opacity:.5;pointer-events:none}
+
+.bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 6px 44px;flex:none}
+.brand{font:400 24px/1 var(--f-display);letter-spacing:.02em}
+.brand small{font:400 11px var(--f-label);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-left:8px}
+.icon-btn{background:none;border:1px solid var(--rule);border-radius:50%;width:38px;height:38px;display:grid;place-items:center;color:var(--ink-soft)}
+.view{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);flex:none;background:var(--paper-lo);border-top:1px solid var(--rule)}
+.tab{background:none;border:0;padding:14px 6px;font:700 12px var(--f-label);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
+.tab[aria-selected="true"]{color:var(--ink);box-shadow:inset 0 3px 0 var(--margin)}
+
+.lab{font:700 11.5px/1.3 var(--f-label);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin:0}
+.hint{font-size:14px;line-height:1.5;color:var(--ink-soft);font-style:italic;margin:2px 0 0}
+.pad{padding:8px 18px 36px 44px}
+.block{display:flex;flex-direction:column;gap:6px;margin-top:26px}
+.ttl{font:400 30px/1.15 var(--f-display);margin:0;text-wrap:balance}
+.fld,.line{width:100%;border:0;background:transparent;color:var(--ink);font:400 17px var(--f-body);line-height:var(--lh);padding:0;border-radius:0}
+.fld{resize:none;overflow:hidden;min-height:calc(var(--lh)*2);background-image:repeating-linear-gradient(transparent 0 calc(var(--lh) - 1px),var(--rule) calc(var(--lh) - 1px) var(--lh));background-attachment:local}
+.line{border-bottom:1px solid var(--rule);height:var(--lh)}
+.fld::placeholder,.line::placeholder{color:var(--ink-soft);opacity:.55;font-style:italic}
+.fld:focus,.line:focus{outline:none;background-color:rgba(255,250,225,.28)}
+
+.datebar{display:flex;align-items:center;gap:10px;padding-top:6px}
+.datebtn{position:relative;flex:1;min-width:0;text-align:left;background:none;border:0;padding:0}
+.datebtn .ttl{font-size:27px}
+.datebtn input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.sub{font:400 12px var(--f-label);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.savestate{font:400 12px var(--f-label);color:var(--ink-soft);min-height:18px;margin-top:2px}
+.carry{margin-top:20px;padding:12px 14px;border:1px dashed var(--ink-soft);border-radius:3px;background:rgba(255,250,225,.25)}
+.carry q{display:block;font:italic 400 18px/1.45 var(--f-body);quotes:none;margin:4px 0 10px}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.pill{border:1px solid var(--ink-soft);background:transparent;border-radius:999px;padding:6px 14px;font:700 12px var(--f-label);letter-spacing:.1em;text-transform:uppercase;min-height:40px}
+.pill[aria-pressed="true"]{background:var(--ink);color:var(--paper-hi);border-color:var(--ink)}
+.moods,.discs{display:flex;gap:8px;flex-wrap:wrap}
+.mood,.disc{width:46px;height:46px;border-radius:50%;border:1.5px solid var(--ink-soft);background:transparent;display:grid;place-items:center;color:var(--ink)}
+.disc{font:700 17px var(--f-label)}
+.mood svg{width:30px;height:30px}
+.mood[aria-pressed="true"],.disc[aria-pressed="true"]{background:var(--ink);color:var(--paper-hi);border-color:var(--ink)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.deep{width:100px;text-align:center;font:700 18px var(--f-label)}
+.tones{display:flex;flex-wrap:wrap;gap:12px}
+.tone{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;padding:0;width:58px;font:400 10.5px/1.2 var(--f-label);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);text-align:center}
+.tone i{width:38px;height:38px;border-radius:50%;border:2px solid var(--edge);background:var(--paper);box-shadow:inset 0 0 8px var(--edge)}
+.tone[aria-pressed="true"]{color:var(--ink)}
+.tone[aria-pressed="true"] i{outline:3px solid var(--ink);outline-offset:2px}
+.photos{display:flex;flex-wrap:wrap;gap:14px;margin-top:4px}
+.ph{position:relative;width:96px;height:96px;padding:5px;background:#f7f0dc;box-shadow:0 2px 6px rgba(60,35,10,.4);transform:rotate(-1.5deg)}
+.ph:nth-child(even){transform:rotate(1.4deg)}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph button{position:absolute;top:-9px;right:-9px;min-width:28px;height:28px;border-radius:14px;border:0;background:var(--ink);color:var(--paper-hi);font:700 11px var(--f-label);padding:0 7px}
+.addph{width:96px;height:96px;border:1.5px dashed var(--ink-soft);background:transparent;border-radius:3px;font:700 11px var(--f-label);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.week{margin-top:34px;padding:14px;border:1.5px dashed var(--ink-soft);border-radius:3px}
+.week dl{margin:8px 0 0;display:grid;grid-template-columns:1fr auto;gap:4px 14px;font:400 14px var(--f-label)}
+.week dd{margin:0;text-align:right}
+.btn{border:1.5px solid var(--ink);background:var(--ink);color:var(--paper-hi);border-radius:3px;padding:10px 16px;font:700 12px var(--f-label);letter-spacing:.14em;text-transform:uppercase;min-height:44px}
+.btn.ghost{background:transparent;color:var(--ink)}
+
+.statline{font:400 13px/1.5 var(--f-label);color:var(--ink-soft);margin:4px 0 0}
+.search{margin-top:14px}
+.mood30{display:flex;align-items:flex-end;gap:3px;height:34px;margin-top:12px}
+.mood30 b{flex:1;min-width:0;background:var(--ink-soft);opacity:.7;border-radius:1px 1px 0 0}
+.mood30 b.none{background:var(--rule);height:3px!important;opacity:1}
+.mon{font:400 22px var(--f-display);margin:26px 0 6px;display:flex;justify-content:space-between;align-items:baseline}
+.mon span{font:400 12px var(--f-label);color:var(--ink-soft)}
+.row{display:grid;grid-template-columns:44px 1fr 30px;gap:12px;align-items:center;width:100%;text-align:left;background:rgba(255,250,225,.22);border:0;border-left:5px solid var(--edge);border-bottom:1px solid var(--rule);padding:10px 10px 10px 10px;margin:0 0 6px;border-radius:0 3px 3px 0}
+.row .d{display:flex;flex-direction:column;align-items:center;line-height:1}
+.row .d b{font:400 28px var(--f-display)}
+.row .d i{font:400 11px var(--f-label);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);font-style:normal;margin-top:3px}
+.row .t{min-width:0;font-size:15px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.row .m svg{width:26px;height:26px;color:var(--ink-soft)}
+.empty{padding:40px 8px;text-align:left}
+.empty .ttl{margin-bottom:10px}
+
+.reels{scroll-snap-type:y mandatory;overflow-y:auto;overscroll-behavior:contain;padding:0}
+.reel{height:100%;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;gap:14px;padding:26px 20px 18px 44px;overflow:hidden;cursor:pointer;border-bottom:1px solid var(--rule)}
+.reel.on .rin{animation:rise .55s ease-out both}
+@keyframes rise{from{opacity:.2;transform:translateY(14px)}to{opacity:1;transform:none}}
+.rin{display:flex;flex-direction:column;gap:14px;min-height:0;flex:1}
+.ago{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.stamp{display:inline-block;font:700 12px var(--f-label);letter-spacing:.2em;text-transform:uppercase;color:var(--stamp);border:2px solid var(--stamp);padding:4px 9px;transform:rotate(-4deg);opacity:.88;border-radius:3px;mix-blend-mode:multiply;white-space:nowrap}
+.bigdate{font:400 42px/1.05 var(--f-display);margin:0;text-wrap:balance}
+.metrics{display:flex;align-items:center;gap:16px;flex-wrap:wrap;font:400 13px var(--f-label);color:var(--ink-soft)}
+.metrics svg{width:28px;height:28px;color:var(--ink)}
+.metrics b{color:var(--ink)}
+.clamp9{display:-webkit-box;-webkit-line-clamp:9;-webkit-box-orient:vertical;overflow:hidden}
+.clamp5{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.body-text{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.learned{border-left:3px solid var(--margin);padding-left:14px}
+.learned p{margin:4px 0 0;font-style:italic;font-size:18px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.rphoto{max-height:30%;min-height:0;display:flex}
+.rphoto img{max-width:100%;max-height:100%;object-fit:cover;border:6px solid #f7f0dc;box-shadow:0 2px 8px rgba(60,35,10,.4);transform:rotate(-1deg)}
+.swipe{font:400 12px var(--f-label);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);display:flex;justify-content:space-between;margin-top:auto;padding-top:6px}
+
+.overlay{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column}
+.overlay .top{display:flex;justify-content:space-between;gap:10px;padding:12px 16px 10px 44px;flex:none}
+.overlay .scroll{flex:1;min-height:0;overflow-y:auto}
+.rd h4{margin:0}
+.rd section{margin-top:22px}
+.rd p{margin:4px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.setrow{display:flex;flex-direction:column;gap:8px;margin-top:26px}
+.legend{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:14px;align-items:center}
+.legend i{width:18px;height:18px;border-radius:50%;border:2px solid var(--edge);background:var(--paper)}
+.toast{position:absolute;left:50%;bottom:76px;transform:translateX(-50%);background:var(--ink);color:var(--paper-hi);padding:9px 16px;border-radius:3px;font:400 13px var(--f-label);z-index:40;max-width:90%}
+
+@media (prefers-reduced-motion:reduce){.reel.on .rin{animation:none}*{scroll-behavior:auto!important}}
+@media (max-width:380px){.ttl{font-size:26px}.bigdate{font-size:36px}.two{gap:12px}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="bar sheet" data-tone="plain" style="box-shadow:none;background:var(--paper)">
+    <div class="brand">Foxed Pages<small id="modeNote"></small></div>
+    <button class="icon-btn" id="menuBtn" aria-label="Backup and settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+    </button>
+  </header>
+  <section id="v-today" class="view sheet" data-tone="plain" aria-label="Write a page"></section>
+  <section id="v-chrono" class="view sheet" data-tone="plain" aria-label="Chronological history" hidden></section>
+  <section id="v-reels" class="view reels" aria-label="Random pages" hidden></section>
+  <nav class="tabs" role="tablist" aria-label="Views">
+    <button class="tab" role="tab" data-tab="today" aria-selected="true">Today</button>
+    <button class="tab" role="tab" data-tab="chrono" aria-selected="false">Chrono</button>
+    <button class="tab" role="tab" data-tab="reels" aria-selected="false">Random</button>
+  </nav>
+  <div id="overlay" class="overlay sheet" data-tone="plain" role="dialog" aria-modal="true" hidden></div>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <input type="file" id="photoIn" accept="image/*" hidden>
+  <input type="file" id="restoreIn" accept="application/json,.json" hidden>
+</div>
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+
+/* ---------- dates (all local, as YYYY-MM-DD) ---------- */
+var MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+var DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+function pad(n){return n<10?'0'+n:''+n}
+function ds(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function pd(s){var p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2])}
+function utc(s){var p=s.split('-');return Date.UTC(+p[0],+p[1]-1,+p[2])}
+function today(){return ds(new Date())}
+function addDays(s,n){var d=pd(s);d.setDate(d.getDate()+n);return ds(d)}
+function diffDays(a,b){return Math.round((utc(a)-utc(b))/864e5)}
+function longDate(s){var d=pd(s);return d.getDate()+' '+MONTHS[d.getMonth()]+' '+d.getFullYear()}
+function weekday(s){return DAYS[pd(s).getDay()]}
+function ago(s){
+  var n=diffDays(today(),s);
+  if(n<0)return 'Coming up'; if(n===0)return 'Today'; if(n===1)return 'Yesterday'; if(n<30)return n+' days ago';
+  var m=Math.floor(n/30.44); if(m<12)return m+(m===1?' month ago':' months ago');
+  var y=Math.floor(n/365.25),r=Math.floor((n-y*365.25)/30.44);
+  return y+(y===1?' year':' years')+(r?' '+r+(r===1?' month':' months'):'')+' ago';
+}
+
+/* ---------- vocabulary ---------- */
+var MOUTH={1:'M7.5 17.5Q12 11.5 16.5 17.5',2:'M8 16.5Q12 13.8 16 16.5',3:'M8.5 15.5H15.5',4:'M8 14Q12 17.8 16 14',5:'M7 13Q12 20.5 17 13Z'};
+var MOODN=['Not set','Very low','Low','Okay','Good','High'];
+function face(n){
+  if(!n)return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-dasharray="2 3" aria-hidden="true"><circle cx="12" cy="12" r="10.2"/></svg>';
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10.2"/><circle cx="8.6" cy="9.4" r=".9" fill="currentColor" stroke="none"/><circle cx="15.4" cy="9.4" r=".9" fill="currentColor" stroke="none"/><path d="'+MOUTH[n]+'"/></svg>';
+}
+var TONES=[
+  {k:'plain',n:'Plain',d:'An ordinary day'},
+  {k:'gold',n:'Win',d:'A big win',s:'A Big Win'},
+  {k:'red',n:'Hard',d:'A hard day',s:'A Hard Day'},
+  {k:'blue',n:'Lesson',d:'A big lesson',s:'A Big Lesson'},
+  {k:'green',n:'Growth',d:'Real growth',s:'Growth'},
+  {k:'plum',n:'Turning',d:'A turning point',s:'Turning Point'}
+];
+function toneOf(k){for(var i=0;i<TONES.length;i++)if(TONES[i].k===k)return TONES[i];return TONES[0]}
+
+/* ---------- entries ---------- */
+var STR=['happened','learned','progress','miss','fix','next','ynWhy','toneNote','needle','adjust'];
+function blank(d){return {date:d,happened:'',learned:'',mood:0,deep:null,disc:0,progress:'',miss:'',fix:'',next:'',yn:'',ynWhy:'',tone:'plain',toneNote:'',needle:'',adjust:'',photos:[],updatedAt:0}}
+function hasContent(e){
+  for(var i=0;i<STR.length;i++)if(String(e[STR[i]]||'').trim())return true;
+  return e.mood>0||e.disc>0||e.deep!=null||(e.photos&&e.photos.length>0)||(e.tone&&e.tone!=='plain')||!!e.yn;
+}
+function clampInt(v,a,b){v=parseInt(v,10);return isNaN(v)?0:Math.max(a,Math.min(b,v))}
+function norm(raw){
+  var e=blank(raw.date);
+  STR.forEach(function(k){if(typeof raw[k]==='string')e[k]=raw[k].slice(0,20000)});
+  e.mood=clampInt(raw.mood,0,5); e.disc=clampInt(raw.disc,0,5);
+  e.deep=(typeof raw.deep==='number'&&isFinite(raw.deep))?Math.max(0,Math.min(24,raw.deep)):null;
+  e.yn=(raw.yn==='done'||raw.yn==='not')?raw.yn:'';
+  e.tone=toneOf(raw.tone).k;
+  e.photos=Array.isArray(raw.photos)?raw.photos.filter(function(x){return typeof x==='string'&&/^[0-9a-f]{32}$/.test(x)}).slice(0,12):[];
+  e.updatedAt=typeof raw.updatedAt==='number'?raw.updatedAt:0;
+  return e;
+}
+function validDate(s){return typeof s==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s)&&ds(pd(s))===s}
+function sortedDates(){return Array.from(S.entries.keys()).sort()}
+function snippet(e){
+  var t=(e.happened||e.learned||e.progress||e.next||e.toneNote||'').replace(/\s+/g,' ').trim();
+  return t||'(Numbers only)';
+}
+
+/* ---------- state + storage (everything stays on this phone) ---------- */
+var KEY='foxed-pages-v1';
+var S={entries:new Map(),mode:'loading',cur:null,date:today(),dirty:false,tab:'today',saveT:0,chain:Promise.resolve(),loaded:false,lastShown:null,photosOk:false,reelEmpty:false,urls:new Map(),pendingBackup:null};
+var readyRes,ready=new Promise(function(r){readyRes=r});
+
+function setSaveState(t){var el=$('#saveState');if(el)el.textContent=t}
+
+/* fallback when IndexedDB is blocked (some private windows): text only, in localStorage */
+function localLoad(){
+  try{var o=JSON.parse(localStorage.getItem(KEY)||'{}');Object.keys(o).forEach(function(k){if(validDate(k))S.entries.set(k,norm(Object.assign({},o[k],{date:k})))})}catch(e){}
+}
+function localWrite(){
+  var o={};S.entries.forEach(function(v,k){o[k]=v});localStorage.setItem(KEY,JSON.stringify(o));
+}
+
+/* IndexedDB: one store for pages (keyed by date), one for photos (keyed by id) */
+var DBH=null;
+function openDB(){
+  if(DBH)return Promise.resolve(DBH);
+  return new Promise(function(res,rej){
+    if(!window.indexedDB)return rej(new Error('no indexedDB'));
+    var r;
+    try{r=indexedDB.open('foxed-pages',1)}catch(e){return rej(e)}
+    r.onupgradeneeded=function(){
+      var d=r.result;
+      if(!d.objectStoreNames.contains('entries'))d.createObjectStore('entries',{keyPath:'date'});
+      if(!d.objectStoreNames.contains('photos'))d.createObjectStore('photos',{keyPath:'id'});
+    };
+    r.onsuccess=function(){DBH=r.result;DBH.onversionchange=function(){DBH.close();DBH=null};res(DBH)};
+    r.onerror=function(){rej(r.error||new Error('indexedDB error'))};
+    r.onblocked=function(){rej(new Error('indexedDB blocked'))};
+  });
+}
+function tx(store,mode,fn){
+  return openDB().then(function(d){
+    return new Promise(function(res,rej){
+      var t=d.transaction(store,mode),req=fn(t.objectStore(store));
+      t.oncomplete=function(){res(req&&req.result)};
+      t.onerror=function(){rej(t.error)};
+      t.onabort=function(){rej(t.error||new Error('aborted'))};
+    });
+  });
+}
+
+/* photos */
+var BLANK='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+function newId(){var a=new Uint8Array(16);crypto.getRandomValues(a);return Array.from(a,function(b){return (b<16?'0':'')+b.toString(16)}).join('')}
+function pimg(id,alt,extra){return '<img data-pid="'+id+'" src="'+BLANK+'" alt="'+esc(alt)+'"'+(extra||'')+'>'}
+function getPhotoRec(id){return tx('photos','readonly',function(s){return s.get(id)})}
+function photoURL(id){
+  if(S.urls.has(id))return Promise.resolve(S.urls.get(id));
+  if(S.mode!=='idb')return Promise.resolve('');
+  return getPhotoRec(id).then(function(r){
+    if(!r||!r.buf)return '';
+    var u=URL.createObjectURL(new Blob([r.buf],{type:r.type||'image/jpeg'}));
+    S.urls.set(id,u);return u;
+  }).catch(function(){return ''});
+}
+function hydrate(root){
+  $$('img[data-pid]:not([data-h])',root).forEach(function(im){
+    im.setAttribute('data-h','1');
+    photoURL(im.dataset.pid).then(function(u){if(u)im.src=u;else im.alt='Photo not found'});
+  });
+}
+function forgetPhoto(id){
+  var u=S.urls.get(id);if(u){URL.revokeObjectURL(u);S.urls.delete(id)}
+  if(S.mode==='idb')tx('photos','readwrite',function(s){return s.delete(id)}).catch(function(){});
+}
+
+async function initStore(){
+  try{
+    var rows=await tx('entries','readonly',function(s){return s.getAll()});
+    (rows||[]).forEach(function(raw){if(raw&&validDate(raw.date))S.entries.set(raw.date,norm(raw))});
+    S.mode='idb';S.photosOk=true;
+  }catch(e){
+    S.mode='local';localLoad();
+    setTimeout(function(){toast('This browser blocks private storage. Pages are kept as text only.')},400);
+  }
+  S.loaded=true;readyRes();
+  if(navigator.storage&&navigator.storage.persist){navigator.storage.persist().catch(function(){})}
+  onData();
+}
+function persist(date,entry,attempt){
+  attempt=attempt||0;
+  S.chain=S.chain.then(function(){return ready}).then(async function(){
+    try{
+      if(S.mode==='idb'){
+        if(entry)await tx('entries','readwrite',function(s){return s.put(entry)});
+        else await tx('entries','readwrite',function(s){return s.delete(date)});
+      }else localWrite();
+      setSaveState(S.dirty?'…':'Saved');
+    }catch(e){
+      if(attempt<3){setSaveState('Could not save. Trying again…');await new Promise(function(r){setTimeout(r,2500*(attempt+1))});persist(date,entry,attempt+1)}
+      else{setSaveState('Not saved. Your phone may be out of storage. Save a backup, then free some space.');S.dirty=true}
+    }
+  });
+}
+function flush(){
+  clearTimeout(S.saveT);
+  if(!S.dirty||!S.cur)return;
+  S.dirty=false;
+  var e=JSON.parse(JSON.stringify(S.cur));e.updatedAt=Date.now();S.cur.updatedAt=e.updatedAt;
+  if(hasContent(e)){S.entries.set(e.date,e);persist(e.date,e);setSaveState('Saving…')}
+  else if(S.entries.has(e.date)){S.entries.delete(e.date);persist(e.date,null);setSaveState('Saving…')}
+  else setSaveState('');
+}
+function touch(){S.dirty=true;setSaveState('…');clearTimeout(S.saveT);S.saveT=setTimeout(flush,900)}
+window.addEventListener('pagehide',flush);
+document.addEventListener('visibilitychange',function(){if(document.hidden)flush()});
+
+/* ---------- small ui helpers ---------- */
+var toastT=0;
+function toast(msg){var t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){t.hidden=true},3600)}
+var lastFocus=null;
+function openOverlay(html,tone){
+  var o=$('#overlay');lastFocus=document.activeElement;
+  o.setAttribute('data-tone',tone||'plain');o.innerHTML=html;o.hidden=false;
+  var f=$('[data-close]',o);if(f)f.focus();
+}
+function closeOverlay(){var o=$('#overlay');o.hidden=true;o.innerHTML='';if(lastFocus&&lastFocus.focus)try{lastFocus.focus()}catch(e){}}
+document.addEventListener('keydown',function(ev){if(ev.key==='Escape'&&!$('#overlay').hidden)closeOverlay()});
+function grow(t){t.style.height='auto';t.style.height=Math.max(64,Math.ceil(t.scrollHeight/32)*32)+'px'}
+
+function fmt(x){return x==null?'–':String(Math.round(x*10)/10)}
+function lab(t){return '<span class="lab" style="display:block">'+esc(t)+'</span>'}
+
+/* ---------- a whole page, as read-only html (reader + reels) ---------- */
+function pageBody(e,compact){
+  var t=toneOf(e.tone),h='',m='';
+  h+='<div class="ago"><span class="sub">'+esc(weekday(e.date))+' · '+esc(ago(e.date))+'</span>'+(t.s?'<span class="stamp">'+esc(t.s)+'</span>':'')+'</div>';
+  h+='<h2 class="bigdate">'+esc(longDate(e.date))+'</h2>';
+  if(e.mood)m+='<span style="display:inline-flex;align-items:center;gap:8px">'+face(e.mood)+'<b>'+MOODN[e.mood]+'</b></span>';
+  if(e.deep!=null)m+='<span><b>'+fmt(e.deep)+'</b> h deep work</span>';
+  if(e.disc)m+='<span>Discipline <b>'+e.disc+'</b>/5</span>';
+  if(m)h+='<div class="metrics">'+m+'</div>';
+  if(e.photos.length){
+    if(compact)h+='<div class="rphoto">'+pimg(e.photos[0],'Photo from this day')+'</div>';
+    else h+='<div class="photos">'+e.photos.map(function(id){return '<div class="ph">'+pimg(id,'Photo from this day')+'</div>'}).join('')+'</div>';
+  }
+  var hp=e.happened.trim(),lp=e.learned.trim();
+  if(hp)h+=compact?'<p class="body-text clamp9">'+esc(hp)+'</p>':'<section>'+lab('What happened')+'<p>'+esc(hp)+'</p></section>';
+  if(lp)h+='<div class="learned"'+(compact?'':' style="margin-top:22px"')+'>'+lab('What I learned')+'<p'+(compact?' class="clamp5"':'')+'>'+esc(lp)+'</p></div>';
+  if(!hp&&!lp&&compact)h+='<p class="hint">Only the numbers were written on this day.</p>';
+  if(!compact){
+    if(e.toneNote.trim())h+='<section>'+lab('Why it mattered')+'<p>'+esc(e.toneNote.trim())+'</p></section>';
+    if(e.progress.trim())h+='<section>'+lab('Progress that moved')+'<p>'+esc(e.progress.trim())+'</p></section>';
+    if(e.miss.trim()||e.fix.trim())h+='<section>'+lab('Biggest miss and the fix')+(e.miss.trim()?'<p>Miss: '+esc(e.miss.trim())+'</p>':'')+(e.fix.trim()?'<p>Fix: '+esc(e.fix.trim())+'</p>':'')+'</section>';
+    var prev=S.entries.get(addDays(e.date,-1));
+    if(e.yn&&prev&&prev.next.trim())h+='<section>'+lab('The non-negotiable from the day before')+'<p>'+esc(prev.next.trim())+' — <b>'+(e.yn==='done'?'done':'not done')+'</b>'+(e.yn==='not'&&e.ynWhy.trim()?'. '+esc(e.ynWhy.trim()):'')+'</p></section>';
+    if(e.next.trim())h+='<section>'+lab('Non-negotiable set for the next day')+'<p>'+esc(e.next.trim())+'</p></section>';
+    if(e.needle.trim()||e.adjust.trim())h+='<section>'+lab('Weekly zoom out')+(e.needle.trim()?'<p>Moved the needle: '+esc(e.needle.trim())+'</p>':'')+(e.adjust.trim()?'<p>Adjustment: '+esc(e.adjust.trim())+'</p>':'')+'</section>';
+  }
+  return h;
+}
+
+/* ---------- Today: write a page ---------- */
+function entryFor(d){return (S.cur&&S.cur.date===d)?S.cur:S.entries.get(d)}
+function range(end,len){var a=[];for(var i=len-1;i>=0;i--)a.push(addDays(end,-i));return a}
+function avgOf(dates,fn){var s=0,n=0;dates.forEach(function(d){var e=entryFor(d);if(!e)return;var x=fn(e);if(x!=null){s+=x;n++}});return n?{v:s/n,n:n}:null}
+function arrow(a,b,th){if(!a||!b)return '→';var d=a.v-b.v;return d>th?'↑':d<-th?'↓':'→'}
+function weekHTML(){
+  var end=S.cur.date,w=range(end,7),p=range(addDays(end,-7),7);
+  var dw=avgOf(w,function(e){return e.deep}),dp=avgOf(p,function(e){return e.deep});
+  var sw=avgOf(w,function(e){return e.disc>0?e.disc:null}),sp=avgOf(p,function(e){return e.disc>0?e.disc:null});
+  var mw=avgOf(w,function(e){return e.mood>0?e.mood:null}),mp=avgOf(p,function(e){return e.mood>0?e.mood:null});
+  var pages=w.filter(function(d){return entryFor(d)&&hasContent(entryFor(d))}).length;
+  function row(name,a,b,th,unit){return '<dt>'+name+'</dt><dd><b>'+fmt(a&&a.v)+unit+'</b> '+arrow(a,b,th)+' <span class="sub" style="text-transform:none;letter-spacing:0">(before: '+fmt(b&&b.v)+')</span></dd>'}
+  return '<dt>Pages written</dt><dd><b>'+pages+'</b> of 7</dd>'+row('Deep work per day',dw,dp,0.25,' h')+row('Discipline score',sw,sp,0.2,'')+row('Mood',mw,mp,0.2,'');
+}
+function loadCur(date){
+  flush();
+  S.date=date;
+  var saved=S.entries.get(date);
+  S.cur=saved?JSON.parse(JSON.stringify(saved)):blank(date);
+  S.dirty=false;
+}
+function ta(f,ph){return '<textarea class="fld" id="f-'+f+'" data-f="'+f+'" rows="2" placeholder="'+esc(ph)+'">'+esc(S.cur[f])+'</textarea>'}
+function ln(f,ph){return '<input class="line" type="text" id="f-'+f+'" data-f="'+f+'" placeholder="'+esc(ph)+'" value="'+esc(S.cur[f])+'" autocomplete="off" maxlength="400">'}
+function renderToday(){
+  var v=$('#v-today');
+  if(!S.loaded){v.innerHTML='<div class="pad"><p class="hint" style="margin-top:30px">Opening your journal…</p></div>';return}
+  if(!S.cur||S.cur.date!==S.date)loadCur(S.date);
+  var e=S.cur,t=today(),prev=S.entries.get(addDays(e.date,-1)),carry=prev&&prev.next.trim()?prev.next.trim():'';
+  var h='<div class="pad">';
+  h+='<div class="datebar"><button class="icon-btn" data-nav="-1" aria-label="Previous day"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>';
+  h+='<label class="datebtn"><span class="sub" id="dSub" style="display:block"></span><span class="ttl" id="dTitle" style="display:block"></span><input type="date" id="dateIn" max="'+t+'" value="'+e.date+'" aria-label="Choose a day to write"></label>';
+  h+='<button class="icon-btn" data-nav="1" id="navNext" aria-label="Next day"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></div>';
+  h+='<div class="savestate" id="saveState" aria-live="polite"></div>';
+  if(carry){
+    h+='<div class="carry" id="carry">'+lab('The day before, you made this non-negotiable')+'<q>'+esc(carry)+'</q><div class="seg"><button class="pill" data-yn="done" aria-pressed="false">Done</button><button class="pill" data-yn="not" aria-pressed="false">Not done</button></div><div id="ynWhyBox" style="margin-top:10px" hidden>'+ln('ynWhy','Why not? No excuses, just the reason.')+'</div></div>';
+  }
+  h+='<div class="block">'+'<label class="lab" for="f-happened">What happened today</label>'+ta('happened','Tell it the way you would tell a friend.')+'</div>';
+  h+='<div class="block"><label class="lab" for="f-learned">What I learned</label>'+ta('learned','One thing this day taught you.')+'</div>';
+  h+='<div class="block"><span class="lab">How the day felt <span id="moodWord"></span></span><div class="moods" role="group" aria-label="Mood">';
+  for(var i=1;i<=5;i++)h+='<button class="mood" data-set="mood" data-v="'+i+'" aria-pressed="false" aria-label="'+MOODN[i]+'">'+face(i)+'</button>';
+  h+='</div></div>';
+  h+='<div class="block"><label class="lab" for="f-deep">Deep work, phone away (hours)</label><input class="line deep" id="f-deep" data-f="deep" type="number" inputmode="decimal" min="0" max="24" step="0.25" placeholder="0" value="'+(e.deep==null?'':e.deep)+'"></div>';
+  h+='<div class="block"><span class="lab">Discipline: did I do what I told myself I would?</span><div class="discs" role="group" aria-label="Discipline score">';
+  for(var j=1;j<=5;j++)h+='<button class="disc" data-set="disc" data-v="'+j+'" aria-pressed="false" aria-label="Score '+j+' of 5">'+j+'</button>';
+  h+='</div></div>';
+  h+='<div class="block"><label class="lab" for="f-progress">Progress that moved</label><p class="hint">One concrete thing that moved forward. Not &ldquo;studied&rdquo;.</p>'+ta('progress','What exactly advanced today?')+'</div>';
+  h+='<div class="block"><label class="lab" for="f-miss">Biggest miss</label>'+ln('miss','One line. Specific.')+'<label class="lab" for="f-fix" style="margin-top:12px">The fix for tomorrow</label>'+ln('fix','Something you can actually do.')+'</div>';
+  h+='<div class="block"><label class="lab" for="f-next">Tomorrow&rsquo;s non-negotiable</label><p class="hint">The one thing.</p>'+ln('next','Write it. It will be waiting for you tomorrow.')+'</div>';
+  h+='<div class="block"><span class="lab">Photos</span><div class="photos" id="photos"></div></div>';
+  h+='<div class="block"><span class="lab">Was today a big moment?</span><p class="hint">Mark it and the paper changes colour for good.</p><div class="tones" role="group" aria-label="Big moment colour">';
+  TONES.forEach(function(x){h+='<button class="tone" data-tone-pick="'+x.k+'" data-tone="'+x.k+'" aria-pressed="false"><i></i>'+esc(x.n)+'</button>'});
+  h+='</div><div id="toneNoteBox" hidden><label class="lab" for="f-toneNote" style="display:block;margin-top:12px">Why it mattered</label>'+ln('toneNote','A line you will want to find later.')+'</div></div>';
+  if(pd(e.date).getDay()===0){
+    h+='<div class="week"><span class="lab">Sunday · weekly zoom out</span><p class="hint">Filled from your own numbers for the 7 days ending today.</p><dl id="weekStats">'+weekHTML()+'</dl>';
+    h+='<div class="block"><label class="lab" for="f-needle">What moved the needle?</label>'+ta('needle','This week, what really counted?')+'</div>';
+    h+='<div class="block"><label class="lab" for="f-adjust">One adjustment for next week</label>'+ln('adjust','Just one.')+'</div></div>';
+  }
+  h+='</div>';
+  v.innerHTML=h;
+  $$('textarea',v).forEach(grow);
+  syncToday();renderPhotos();
+}
+function syncToday(){
+  var v=$('#v-today'),e=S.cur;if(!e)return;
+  v.setAttribute('data-tone',e.tone);
+  var dl=ago(e.date);
+  $('#dSub',v).textContent=weekday(e.date)+(dl==='Today'?' · Today':' · '+dl);
+  $('#dTitle',v).textContent=longDate(e.date);
+  $('#navNext',v).disabled=e.date>=today();$('#navNext',v).style.opacity=e.date>=today()?'.35':'1';
+  $$('[data-set]',v).forEach(function(b){b.setAttribute('aria-pressed',String(e[b.dataset.set]===+b.dataset.v))});
+  $$('[data-tone-pick]',v).forEach(function(b){b.setAttribute('aria-pressed',String(e.tone===b.dataset.tonePick))});
+  $$('[data-yn]',v).forEach(function(b){b.setAttribute('aria-pressed',String(e.yn===b.dataset.yn))});
+  var yb=$('#ynWhyBox',v);if(yb)yb.hidden=e.yn!=='not';
+  $('#toneNoteBox',v).hidden=e.tone==='plain';
+  $('#moodWord',v).textContent=e.mood?'· '+MOODN[e.mood]:'';
+}
+function renderPhotos(){
+  var box=$('#photos');if(!box||!S.cur)return;
+  var h=S.cur.photos.map(function(id,i){return '<div class="ph">'+pimg(id,'Photo '+(i+1)+' from this day')+'<button data-rm-photo="'+id+'" aria-label="Remove photo">\u2715</button></div>'}).join('');
+  if(S.photosOk)h+='<button class="addph" data-add-photo>+ Photo</button>';
+  box.innerHTML=h||'<p class="hint">Photos need normal browser storage, which is blocked here.</p>';
+  hydrate(box);
+}
+function shrink(file){
+  return new Promise(function(res,rej){
+    var url=URL.createObjectURL(file),img=new Image();
+    img.onload=function(){
+      var w=img.naturalWidth,h=img.naturalHeight,s=Math.min(1,1600/Math.max(w,h)),c=document.createElement('canvas');
+      c.width=Math.round(w*s);c.height=Math.round(h*s);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      URL.revokeObjectURL(url);c.toBlob(function(b){b?res(b):rej(new Error('encode'))},'image/jpeg',0.82);
+    };
+    img.onerror=function(){URL.revokeObjectURL(url);rej(new Error('decode'))};
+    img.src=url;
+  });
+}
+function go(date){
+  if(date>today())date=today();
+  flush();S.date=date;S.cur=null;renderToday();
+  $('#v-today').scrollTop=0;
+}
+var todayEl=$('#v-today');
+todayEl.addEventListener('input',function(ev){
+  var t=ev.target,f=t.dataset&&t.dataset.f;
+  if(t.id==='dateIn')return;
+  if(!f||!S.cur)return;
+  if(f==='deep'){var n=parseFloat(t.value);S.cur.deep=(t.value===''||isNaN(n))?null:Math.max(0,Math.min(24,n))}
+  else S.cur[f]=t.value;
+  if(t.tagName==='TEXTAREA')grow(t);
+  if(f==='deep'){var w=$('#weekStats');if(w)w.innerHTML=weekHTML()}
+  touch();
+});
+todayEl.addEventListener('change',function(ev){
+  if(ev.target.id==='dateIn'){var d=ev.target.value;if(validDate(d)&&d<=today())go(d)}
+});
+todayEl.addEventListener('click',function(ev){
+  var b=ev.target.closest('button');if(!b||!S.cur)return;
+  if(b.dataset.nav){go(addDays(S.cur.date,+b.dataset.nav));return}
+  if(b.dataset.set){var k=b.dataset.set,val=+b.dataset.v;S.cur[k]=S.cur[k]===val?0:val;syncToday();touch();if(k==='disc'){var w=$('#weekStats');if(w)w.innerHTML=weekHTML()}return}
+  if(b.dataset.tonePick){S.cur.tone=b.dataset.tonePick;syncToday();touch();return}
+  if(b.dataset.yn){S.cur.yn=S.cur.yn===b.dataset.yn?'':b.dataset.yn;syncToday();touch();return}
+  if(b.hasAttribute('data-add-photo')){$('#photoIn').click();return}
+  if(b.dataset.rmPhoto){
+    if(b.dataset.armed){
+      var id=b.dataset.rmPhoto;S.cur.photos=S.cur.photos.filter(function(x){return x!==id});
+      touch();flush();renderPhotos();
+      forgetPhoto(id);
+    }else{b.dataset.armed='1';b.textContent='Delete?';setTimeout(function(){if(b.isConnected){delete b.dataset.armed;b.textContent='✕'}},3000)}
+  }
+});
+$('#photoIn').addEventListener('change',async function(ev){
+  var f=ev.target.files&&ev.target.files[0];ev.target.value='';
+  if(!f||!S.cur)return;
+  if(!S.photosOk){toast('Photos need normal browser storage, which is blocked here.');return}
+  if(S.cur.photos.length>=12){toast('That page already has 12 photos.');return}
+  var date=S.cur.date;toast('Adding photo\u2026');
+  try{
+    var blob=await shrink(f),buf=await blob.arrayBuffer(),id=newId();
+    await tx('photos','readwrite',function(s){return s.put({id:id,buf:buf,type:'image/jpeg'})});
+    if(!S.cur||S.cur.date!==date){forgetPhoto(id);toast('You changed day, so the photo was not added. Try again.');return}
+    S.cur.photos.push(id);touch();flush();renderPhotos();toast('Photo added.');
+  }catch(e){toast('Could not add that photo. Your phone may be out of storage.')}
+});
+
+/* ---------- Chrono ---------- */
+function stats(){
+  var list=sortedDates(),set=new Set(list),t=today(),streak=0,d=set.has(t)?t:addDays(t,-1);
+  while(set.has(d)){streak++;d=addDays(d,-1)}
+  var ms=0,mc=0;S.entries.forEach(function(e){if(e.mood>0){ms+=e.mood;mc++}});
+  return {n:list.length,streak:streak,avg:mc?ms/mc:null};
+}
+function renderChrono(){
+  var v=$('#v-chrono');
+  if(!$('#chronoList',v)){
+    v.innerHTML='<div class="pad"><h1 class="ttl" style="margin-top:6px">Chrono</h1><p class="statline" id="chronoStats"></p><p class="statline" id="bkNote"></p><div class="mood30" id="mood30" aria-hidden="true"></div><span class="sub" style="display:block;margin-top:4px">Mood, last 30 days</span><div class="search"><label class="lab" for="q">Search every page</label><input class="line" id="q" type="search" placeholder="A word, a name, a place" autocomplete="off"></div><div id="chronoList"></div></div>';
+  }
+  var s=stats();
+  $('#chronoStats',v).textContent=s.n+(s.n===1?' page':' pages')+' · '+s.streak+'-day streak · average mood '+(s.avg==null?'–':fmt(s.avg));
+  var lb0=lastBackup(),stale=!lb0||diffDays(today(),lb0)>14;
+  $('#bkNote',v).textContent=(s.n>=3&&stale)?('Last backup: '+(lb0?ago(lb0).toLowerCase():'never')+'. Open the \u22ef menu to save one.'):'';
+  var bars='';range(today(),30).forEach(function(d){var e=S.entries.get(d);bars+=(e&&e.mood>0)?'<b style="height:'+(e.mood*20)+'%"></b>':'<b class="none"></b>'});
+  $('#mood30',v).innerHTML=bars;
+  var q=($('#q',v).value||'').trim().toLowerCase(),list=sortedDates().reverse();
+  if(q)list=list.filter(function(d){var e=S.entries.get(d);return STR.some(function(k){return String(e[k]).toLowerCase().indexOf(q)>-1})||longDate(d).toLowerCase().indexOf(q)>-1});
+  var h='',cur='',cnt={};
+  list.forEach(function(d){var k=d.slice(0,7);cnt[k]=(cnt[k]||0)+1});
+  list.forEach(function(d){
+    var e=S.entries.get(d),k=d.slice(0,7);
+    if(k!==cur){cur=k;var p=k.split('-');h+='<div class="mon"><span style="font:400 22px var(--f-display);color:var(--ink)">'+MONTHS[+p[1]-1]+' '+p[0]+'</span><span>'+cnt[k]+(cnt[k]===1?' page':' pages')+'</span></div>'}
+    h+='<button class="row" data-open="'+d+'" data-tone="'+e.tone+'"><span class="d"><b>'+pd(d).getDate()+'</b><i>'+weekday(d).slice(0,3)+'</i></span><span class="t">'+esc(snippet(e))+'</span><span class="m">'+face(e.mood)+'</span></button>';
+  });
+  if(!list.length){
+    h=q?'<div class="empty"><p class="hint">No page mentions that.</p></div>':'<div class="empty"><h2 class="ttl">The first page is blank.</h2><p class="hint" style="margin-bottom:16px">Write today and it will be filed here by date, newest first.</p><button class="btn" data-go-today>Write today</button></div>';
+  }
+  $('#chronoList',v).innerHTML=h;
+}
+$('#v-chrono').addEventListener('input',function(ev){if(ev.target.id==='q')renderChrono()});
+$('#v-chrono').addEventListener('click',function(ev){
+  var b=ev.target.closest('button');if(!b)return;
+  if(b.dataset.open)openReader(b.dataset.open);
+  if(b.hasAttribute('data-go-today'))setTab('today');
+});
+
+/* ---------- Reader ---------- */
+function openReader(date){
+  var e=S.entries.get(date);if(!e)return;
+  openOverlay('<div class="top"><button class="btn ghost" data-close>Close</button><button class="btn" data-edit="'+date+'">Edit page</button></div><div class="scroll"><div class="pad rd">'+pageBody(e,false)+'</div></div>',e.tone);
+  var s=$('#overlay .scroll');if(s)s.scrollTop=0;
+  hydrate($('#overlay'));
+}
+$('#overlay').addEventListener('click',function(ev){
+  var b=ev.target.closest('button');if(!b)return;
+  if(b.hasAttribute('data-close'))closeOverlay();
+  else if(b.dataset.edit){var d=b.dataset.edit;closeOverlay();S.date=d;S.cur=null;setTab('today')}
+  else if(b.hasAttribute('data-backup'))doBackup(false);
+  else if(b.hasAttribute('data-share'))doBackup(true);
+  else if(b.hasAttribute('data-install')){if(deferredInstall){var dp=deferredInstall;deferredInstall=null;dp.prompt()}}
+  else if(b.hasAttribute('data-restore'))$('#restoreIn').click();
+});
+
+/* ---------- Random: reels ---------- */
+var io=null;
+function filled(){return sortedDates().filter(function(d){return hasContent(S.entries.get(d))})}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+function nextBatch(){
+  var d=shuffle(filled());
+  if(S.lastShown&&d.length>1&&d[0]===S.lastShown){var t=d[0];d[0]=d[d.length-1];d[d.length-1]=t}
+  return d.slice(0,8);
+}
+function sizeReels(){var v=$('#v-reels'),h=v.clientHeight;if(h>0)$$('.reel',v).forEach(function(c){c.style.height=h+'px'})}
+function addReels(){
+  var v=$('#v-reels'),b=nextBatch(),h='';
+  b.forEach(function(d){var e=S.entries.get(d);h+='<article class="reel sheet" data-tone="'+e.tone+'" data-open="'+d+'" tabindex="0" aria-label="Page from '+esc(longDate(d))+'"><div class="rin">'+pageBody(e,true)+'<div class="swipe"><span>Tap to read the page</span><span>Swipe up ↑</span></div></div></article>'});
+  v.insertAdjacentHTML('beforeend',h);
+  hydrate(v);
+  sizeReels();
+  $$('.reel:not([data-seen])',v).forEach(function(c){c.setAttribute('data-seen','1');if(io)io.observe(c)});
+}
+function renderReels(){
+  var v=$('#v-reels');
+  if(io){io.disconnect();io=null}
+  v.innerHTML='';S.reelEmpty=false;
+  if(!filled().length){
+    S.reelEmpty=true;
+    v.innerHTML='<div class="sheet" data-tone="plain" style="height:100%"><div class="pad empty"><h2 class="ttl">Nothing to shuffle yet.</h2><p class="hint" style="margin-bottom:16px">Pages you write will turn up here in random order, one per swipe.</p><button class="btn" data-go-today>Write today</button></div></div>';
+    return;
+  }
+  io=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(!en.isIntersecting||en.intersectionRatio<0.6)return;
+      var c=en.target;c.classList.add('on');S.lastShown=c.dataset.open;
+      var all=$$('.reel',v);if(all.indexOf(c)>=all.length-3)addReels();
+    });
+  },{root:v,threshold:[0.6]});
+  addReels();
+  v.scrollTop=0;
+}
+$('#v-reels').addEventListener('click',function(ev){
+  if(ev.target.closest('[data-go-today]')){setTab('today');return}
+  var c=ev.target.closest('[data-open]');if(c)openReader(c.dataset.open);
+});
+$('#v-reels').addEventListener('keydown',function(ev){
+  if(ev.key==='Enter'){var c=ev.target.closest('[data-open]');if(c)openReader(c.dataset.open)}
+});
+if(window.ResizeObserver)new ResizeObserver(sizeReels).observe($('#v-reels'));
+window.addEventListener('resize',sizeReels);
+
+/* ---------- backup + restore ---------- */
+var deferredInstall=null;
+window.addEventListener('beforeinstallprompt',function(ev){ev.preventDefault();deferredInstall=ev});
+window.addEventListener('appinstalled',function(){deferredInstall=null});
+function isStandalone(){return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true}
+function canShareFiles(){try{return !!(navigator.canShare&&navigator.canShare({files:[new File(['{}'],'a.json',{type:'application/json'})]}))}catch(e){return false}}
+function lastBackup(){try{return localStorage.getItem('foxed-last-backup')||''}catch(e){return ''}}
+function markBackup(){try{localStorage.setItem('foxed-last-backup',today())}catch(e){}}
+function setMsg(t){var el=$('#setMsg');if(el)el.textContent=t}
+
+function openMenu(){
+  S.pendingBackup=null;
+  var n=S.entries.size,lb=lastBackup(),h='<div class="top"><button class="btn ghost" data-close>Close</button></div><div class="scroll"><div class="pad">';
+  h+='<h2 class="ttl">Backup and colours</h2>';
+  h+='<p class="hint" style="margin-top:8px">Your pages live on this phone only. There is no account and no server. '+n+(n===1?' page is':' pages are')+' stored. Last backup: '+(lb?esc(longDate(lb)):'never')+'.</p>';
+  h+='<div class="setrow">'+lab('Backup file')+'<button class="btn" data-backup>Save a backup file</button>';
+  if(canShareFiles())h+='<button class="btn" data-share>Share backup (Drive, email, WhatsApp)</button>';
+  h+='<button class="btn ghost" data-restore>Restore from a backup file</button><p class="hint" id="setMsg">The file holds every page and photo. Keep a copy in Google Drive or email it to yourself, so losing this phone does not lose your journal.</p></div>';
+  h+='<div class="setrow">'+lab('Is this storage safe?')+'<p class="hint" id="persistMsg" style="margin:0">Checking…</p></div>';
+  if(!isStandalone()){
+    h+='<div class="setrow">'+lab('Install on your phone')+(deferredInstall?'<button class="btn" data-install>Install app</button>':'')+'<p class="hint" style="margin:0">Android Chrome: ⋮ menu, then Install app or Add to Home screen. iPhone Safari: Share button, then Add to Home Screen.</p></div>';
+  }
+  h+='<div class="setrow">'+lab('What the paper colours mean')+'<div class="legend">'+TONES.map(function(x){return '<i data-tone="'+x.k+'"></i><span>'+esc(x.d)+'</span>'}).join('')+'</div></div>';
+  h+='</div></div>';
+  openOverlay(h,'plain');
+  var pm=$('#persistMsg');
+  if(navigator.storage&&navigator.storage.persisted){
+    navigator.storage.persisted().then(function(p){
+      if(pm)pm.textContent=p?'Your phone has agreed to keep this storage permanently.':'Your phone may clear this storage if it runs very low on space. Backups are your safety net.';
+    }).catch(function(){if(pm)pm.textContent='Save a backup now and then. It is your safety net.'});
+  }else if(pm)pm.textContent='Save a backup now and then. It is your safety net.';
+}
+function blobToDataURL(b){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(r.result)};r.onerror=function(){rej(r.error)};r.readAsDataURL(b)})}
+function b64buf(u){var b=atob(u.slice(u.indexOf(',')+1)),a=new Uint8Array(b.length);for(var k=0;k<b.length;k++)a[k]=b.charCodeAt(k);return a.buffer}
+async function buildBackupFile(){
+  flush();await S.chain;
+  var photos={},used={};
+  S.entries.forEach(function(e){e.photos.forEach(function(id){used[id]=1})});
+  if(S.mode==='idb'){
+    var ids=Object.keys(used);
+    for(var i=0;i<ids.length;i++){
+      var r=await getPhotoRec(ids[i]);
+      if(r&&r.buf)photos[ids[i]]=await blobToDataURL(new Blob([r.buf],{type:r.type||'image/jpeg'}));
+    }
+  }
+  var data={app:'foxed-pages',version:2,exportedAt:new Date().toISOString(),entries:sortedDates().map(function(d){return S.entries.get(d)}),photos:photos};
+  return new File([JSON.stringify(data)],'foxed-pages-backup-'+today()+'.json',{type:'application/json'});
+}
+async function doBackup(share){
+  try{
+    var file=(share&&S.pendingBackup)||null;
+    if(!file){setMsg('Preparing your backup…');file=await buildBackupFile()}
+    if(share){
+      try{await navigator.share({files:[file],title:'Foxed Pages backup'});S.pendingBackup=null;markBackup();setMsg('Backup shared.');return}
+      catch(e){
+        if(e&&e.name==='AbortError'){S.pendingBackup=null;setMsg('Cancelled.');return}
+        S.pendingBackup=file;setMsg('Your backup is ready. Tap the Share button once more to send it.');return;
+      }
+    }
+    var u=URL.createObjectURL(file),a=document.createElement('a');
+    a.href=u;a.download=file.name;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(u)},8000);
+    markBackup();setMsg('Backup file created. Look for it in your Downloads.');
+  }catch(e){setMsg('Could not create the backup. Try again.')}
+}
+$('#restoreIn').addEventListener('change',async function(ev){
+  var f=ev.target.files&&ev.target.files[0];ev.target.value='';if(!f)return;
+  try{
+    var o=JSON.parse(await f.text());
+    if(!o||o.app!=='foxed-pages'||!Array.isArray(o.entries))throw new Error('format');
+    var pm=(o.photos&&typeof o.photos==='object')?o.photos:{},added=0;
+    for(var i=0;i<o.entries.length;i++){
+      var raw=o.entries[i];
+      if(!raw||!validDate(raw.date))continue;
+      var e=norm(raw),old=S.entries.get(e.date);
+      e.photos=S.mode==='idb'?e.photos.filter(function(id){return typeof pm[id]==='string'&&pm[id].indexOf('data:image/')===0}):[];
+      if(!hasContent(e)||(old&&old.updatedAt>=e.updatedAt))continue;
+      for(var j=0;j<e.photos.length;j++){
+        var id=e.photos[j],m=/^data:([^;,]+)/.exec(pm[id]),buf=b64buf(pm[id]),type=m?m[1]:'image/jpeg';
+        await tx('photos','readwrite',function(s){return s.put({id:id,buf:buf,type:type})});
+      }
+      S.entries.set(e.date,e);persist(e.date,e);added++;
+    }
+    if(S.cur&&!S.dirty)S.cur=null;
+    setMsg(added?('Restored '+added+(added===1?' page.':' pages.')):'Nothing new in that file.');
+    onData();
+  }catch(err){setMsg('That file is not a Foxed Pages backup.')}
+});
+$('#menuBtn').addEventListener('click',openMenu);
+
+/* ---------- tabs + data flow ---------- */
+function setTab(k){
+  if(k!==S.tab)flush();
+  S.tab=k;
+  $$('.tab').forEach(function(b){b.setAttribute('aria-selected',String(b.dataset.tab===k))});
+  $('#v-today').hidden=k!=='today';$('#v-chrono').hidden=k!=='chrono';$('#v-reels').hidden=k!=='reels';
+  if(k==='today')renderToday();else if(k==='chrono')renderChrono();else renderReels();
+}
+$$('.tab').forEach(function(b){b.addEventListener('click',function(){setTab(b.dataset.tab)})});
+function onData(){
+  if(S.tab==='today'){
+    var v=$('#v-today'),saved=S.entries.get(S.date);
+    if(!S.cur||S.cur.date!==S.date){renderToday()}
+    else if(!S.dirty&&!v.contains(document.activeElement)&&((saved&&saved.updatedAt)||0)!==(S.cur.updatedAt||0)){S.cur=null;renderToday()}
+  }else if(S.tab==='chrono')renderChrono();
+  else if(S.tab==='reels'&&S.reelEmpty&&filled().length)renderReels();
+}
+/* a page keeps working with no storage answer: show the form shell, then light up */
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
+setTab('today');
+initStore();
+})();
+</script>
+</body>
+</html>
